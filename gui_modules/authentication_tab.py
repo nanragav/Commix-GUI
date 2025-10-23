@@ -71,6 +71,19 @@ class AuthenticationTab(QWidget):
             options['auth_data'] = self.auth_data_input.text()
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'auth_type' in options:
+            index = self.auth_type_combo.findText(options['auth_type'])
+            if index >= 0:
+                self.auth_type_combo.setCurrentIndex(index)
+        if 'auth_cred' in options:
+            self.auth_cred_input.setText(options['auth_cred'])
+        if 'auth_url' in options:
+            self.auth_url_input.setText(options['auth_url'])
+        if 'auth_data' in options:
+            self.auth_data_input.setText(options['auth_data'])
         
     def reset(self):
         """Reset all fields to default"""

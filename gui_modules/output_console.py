@@ -224,3 +224,26 @@ class OutputConsole(QWidget):
         clipboard = QApplication.clipboard()
         clipboard.setText(self.output_text.toPlainText())
         self.append_info("✓ Output copied to clipboard")
+    
+    def get_output_text(self):
+        """Get all output text for saving"""
+        return self.output_text.toPlainText()
+    
+    def set_output_text(self, text):
+        """Set output text from loaded session"""
+        self.output_text.setPlainText(text)
+        self.update_line_count()
+    
+    def get_stats(self):
+        """Get current stats for saving"""
+        return {
+            'line_count': self.output_text.document().blockCount(),
+            'char_count': len(self.output_text.toPlainText())
+        }
+    
+    def set_stats(self, stats):
+        """Restore stats from session"""
+        if stats:
+            line_count = stats.get('line_count', 0)
+            self.stats_label.setText(f"Lines: {line_count}")
+

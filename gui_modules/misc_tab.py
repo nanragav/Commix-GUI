@@ -256,6 +256,45 @@ class MiscTab(QWidget):
             options['answers'] = self.answers_input.text()
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'verbose' in options:
+            self.verbose_spin.setValue(options['verbose'])
+        if 'batch' in options:
+            self.batch_check.setChecked(options['batch'])
+        if 'wizard' in options:
+            self.wizard_check.setChecked(options['wizard'])
+        if 'offline' in options:
+            self.offline_check.setChecked(options['offline'])
+        if 'session_file' in options:
+            self.session_file_input.setText(options['session_file'])
+        if 'flush_session' in options:
+            self.flush_session_check.setChecked(options['flush_session'])
+        if 'ignore_session' in options:
+            self.ignore_session_check.setChecked(options['ignore_session'])
+        if 'output_dir' in options:
+            self.output_dir_input.setText(options['output_dir'])
+        if 'traffic_file' in options:
+            self.traffic_file_input.setText(options['traffic_file'])
+        if 'no_logging' in options:
+            self.no_logging_check.setChecked(options['no_logging'])
+        if 'skip_heuristics' in options:
+            self.skip_heuristics_check.setChecked(options['skip_heuristics'])
+        if 'skip_waf' in options:
+            self.skip_waf_check.setChecked(options['skip_waf'])
+        if 'codec' in options:
+            self.codec_input.setText(options['codec'])
+        if 'charset' in options:
+            self.charset_input.setText(options['charset'])
+        if 'time_limit' in options:
+            self.time_limit_spin.setValue(options['time_limit'])
+        if 'check_internet' in options:
+            self.check_internet_check.setChecked(options['check_internet'])
+        if 'alert' in options:
+            self.alert_input.setPlainText(options['alert'])
+        if 'answers' in options:
+            self.answers_input.setText(options['answers'])
         
     def reset(self):
         """Reset all fields to default"""

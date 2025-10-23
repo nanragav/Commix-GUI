@@ -244,6 +244,57 @@ class RequestTab(QWidget):
             options['pdel'] = self.param_del_input.text()
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'agent' in options:
+            self.user_agent_input.setText(options['agent'])
+        if 'random_agent' in options:
+            self.random_agent_check.setChecked(options['random_agent'])
+        if 'mobile' in options:
+            self.mobile_check.setChecked(options['mobile'])
+        if 'host' in options:
+            self.host_input.setText(options['host'])
+        if 'referer' in options:
+            self.referer_input.setText(options['referer'])
+        if 'cookie' in options:
+            self.cookie_input.setText(options['cookie'])
+        if 'cdel' in options:
+            self.cookie_del_input.setText(options['cdel'])
+        if 'header' in options:
+            self.header_input.setText(options['header'])
+        if 'headers' in options:
+            self.headers_input.setPlainText(options['headers'])
+        if 'timeout' in options:
+            self.timeout_spin.setValue(options['timeout'])
+        if 'retries' in options:
+            self.retries_spin.setValue(options['retries'])
+        if 'delay' in options:
+            self.delay_spin.setValue(options['delay'])
+        if 'http10' in options:
+            self.http10_check.setChecked(options['http10'])
+        if 'force_ssl' in options:
+            self.force_ssl_check.setChecked(options['force_ssl'])
+        if 'ignore_redirects' in options:
+            self.ignore_redirects_check.setChecked(options['ignore_redirects'])
+        if 'drop_set_cookie' in options:
+            self.drop_set_cookie_check.setChecked(options['drop_set_cookie'])
+        if 'proxy' in options:
+            self.proxy_input.setText(options['proxy'])
+        if 'ignore_proxy' in options:
+            self.ignore_proxy_check.setChecked(options['ignore_proxy'])
+        if 'tor' in options:
+            self.tor_check.setChecked(options['tor'])
+        if 'tor_port' in options:
+            self.tor_port_input.setText(options['tor_port'])
+        if 'tor_check' in options:
+            self.tor_check_box.setChecked(options['tor_check'])
+        if 'abort_code' in options:
+            self.abort_code_input.setText(options['abort_code'])
+        if 'ignore_code' in options:
+            self.ignore_code_input.setText(options['ignore_code'])
+        if 'pdel' in options:
+            self.param_del_input.setText(options['pdel'])
         
     def reset(self):
         """Reset all fields to default"""

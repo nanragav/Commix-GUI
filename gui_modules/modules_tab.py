@@ -44,6 +44,11 @@ class ModulesTab(QWidget):
             options['shellshock'] = True
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'shellshock' in options:
+            self.shellshock_check.setChecked(options['shellshock'])
         
     def reset(self):
         """Reset all fields to default"""

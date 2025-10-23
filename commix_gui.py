@@ -29,6 +29,7 @@ from gui_modules.misc_tab import MiscTab
 from gui_modules.commix_runner import CommixRunner
 from gui_modules.output_console import OutputConsole
 from gui_modules.project_manager import ProjectManager
+from gui_modules.session_manager import SessionManager
 from gui_modules.commix_manager import CommixManager
 from gui_modules.commix_setup_dialog import CommixSetupDialog
 
@@ -39,8 +40,10 @@ class CommixGUI(QMainWindow):
     def __init__(self):
         super().__init__()
         self.project_manager = ProjectManager()
+        self.session_manager = SessionManager()
         self.commix_runner = None
         self.commix_manager = None
+        self.current_project_file = None
         
         # Check for Commix installation
         if not self.check_commix_installation():
@@ -518,31 +521,85 @@ class CommixGUI(QMainWindow):
         
     def new_project(self):
         """Create a new project"""
-        reply = QMessageBox.question(self, "New Project", 
-                                    "Create a new project? Unsaved changes will be lost.",
-                                    QMessageBox.StandardButton.Yes | 
-                                    QMessageBox.StandardButton.No)
-        if reply == QMessageBox.StandardButton.Yes:
-            self.reset_all_tabs()
-            self.output_console.clear()
-            self.status_bar.showMessage("New project created")
+        # Check for unsaved changes
+        if self.session_manager.is_session_modified():
+            reply = QMessageBox.question(
+                self, "Unsaved Changes", 
+                "You have unsaved changes. Do you want to save before creating a new project?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | 
+                QMessageBox.StandardButton.Cancel
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                self.save_project()
+            elif reply == QMessageBox.StandardButton.Cancel:
+                return
+        
+        self.reset_all_tabs()
+        self.output_console.clear()
+        self.session_manager.clear_current_file()
+        self.current_project_file = None
+        self.status_bar.showMessage("New project created")
+        self.update_window_title()
             
     def open_project(self):
         """Open an existing project"""
+        # Check for unsaved changes
+        if self.session_manager.is_session_modified():
+            reply = QMessageBox.question(
+                self, "Unsaved Changes", 
+                "You have unsaved changes. Do you want to save before opening another project?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | 
+                QMessageBox.StandardButton.Cancel
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                self.save_project()
+            elif reply == QMessageBox.StandardButton.Cancel:
+                return
+        
         filename, _ = QFileDialog.getOpenFileName(
             self, "Open Project", "", "Commix Project Files (*.cproj);;All Files (*)"
         )
         if filename:
             try:
-                project_data = self.project_manager.load_project(filename)
-                self.load_project_data(project_data)
+                full_data = self.session_manager.load_session(filename)
+                session_data = full_data.get('session_data', {})
+                
+                # Get all tabs
+                tabs = {
+                    'target': self.target_tab,
+                    'request': self.request_tab,
+                    'authentication': self.auth_tab,
+                    'injection': self.injection_tab,
+                    'detection': self.detection_tab,
+                    'enumeration': self.enumeration_tab,
+                    'file_access': self.file_access_tab,
+                    'modules': self.modules_tab,
+                    'misc': self.misc_tab
+                }
+                
+                # Restore all data
+                self.session_manager.restore_all_data(session_data, tabs, self.output_console)
+                
+                self.current_project_file = filename
                 self.status_bar.showMessage(f"Project loaded: {filename}")
+                self.update_window_title()
+                
+                # Show success message
+                saved_at = full_data.get('saved_at', 'Unknown')
+                QMessageBox.information(
+                    self, "Project Loaded",
+                    f"Successfully loaded project:\n\n"
+                    f"File: {filename}\n"
+                    f"Saved at: {saved_at}\n\n"
+                    f"All fields and output have been restored."
+                )
+                
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to open project: {str(e)}")
+                QMessageBox.critical(self, "Error", f"Failed to open project:\n\n{str(e)}")
                 
     def save_project(self):
         """Save the current project"""
-        if hasattr(self, 'current_project_file'):
+        if self.current_project_file:
             self.save_project_to_file(self.current_project_file)
         else:
             self.save_project_as()
@@ -559,17 +616,60 @@ class CommixGUI(QMainWindow):
             self.current_project_file = filename
             
     def save_project_to_file(self, filename):
-        """Save project data to file"""
+        """Save complete session data to file"""
         try:
-            project_data = self.collect_options()
-            self.project_manager.save_project(filename, project_data)
+            # Get all tabs
+            tabs = {
+                'target': self.target_tab,
+                'request': self.request_tab,
+                'authentication': self.auth_tab,
+                'injection': self.injection_tab,
+                'detection': self.detection_tab,
+                'enumeration': self.enumeration_tab,
+                'file_access': self.file_access_tab,
+                'modules': self.modules_tab,
+                'misc': self.misc_tab
+            }
+            
+            # Collect all data
+            session_data = self.session_manager.collect_all_data(tabs, self.output_console)
+            
+            # Save to file
+            self.session_manager.save_session(filename, session_data)
+            
             self.status_bar.showMessage(f"Project saved: {filename}")
+            self.update_window_title()
+            
+            # Show success message with details
+            tab_count = len(session_data['tabs_data'])
+            output_lines = session_data['output_data'].get('stats', {}).get('line_count', 0)
+            
+            QMessageBox.information(
+                self, "Project Saved",
+                f"Successfully saved project:\n\n"
+                f"File: {filename}\n"
+                f"Tabs saved: {tab_count}\n"
+                f"Output lines: {output_lines}\n\n"
+                f"All field data and console output have been saved."
+            )
+            
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to save project: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Failed to save project:\n\n{str(e)}")
+    
+    def update_window_title(self):
+        """Update window title with current file"""
+        base_title = "Commix GUI - Command Injection Exploitation Tool"
+        if self.current_project_file:
+            import os
+            filename = os.path.basename(self.current_project_file)
+            modified = " *" if self.session_manager.is_session_modified() else ""
+            self.setWindowTitle(f"{base_title} - {filename}{modified}")
+        else:
+            self.setWindowTitle(base_title)
             
     def load_project_data(self, data):
-        """Load project data into tabs"""
-        # Implementation depends on tab structure
+        """Load project data into tabs (deprecated - use session_manager)"""
+        # This method is kept for backward compatibility
         pass
         
     def reset_all_tabs(self):

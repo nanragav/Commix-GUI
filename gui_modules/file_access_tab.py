@@ -100,6 +100,19 @@ class FileAccessTab(QWidget):
             options['file_dest'] = self.file_dest_upload_input.text()
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'file_read' in options:
+            self.file_read_input.setText(options['file_read'])
+        if 'file_write' in options:
+            self.file_write_input.setText(options['file_write'])
+        if 'file_upload' in options:
+            self.file_upload_input.setText(options['file_upload'])
+        if 'file_dest' in options:
+            # Set both destination fields (they share the same option)
+            self.file_dest_write_input.setText(options['file_dest'])
+            self.file_dest_upload_input.setText(options['file_dest'])
         
     def reset(self):
         """Reset all fields to default"""

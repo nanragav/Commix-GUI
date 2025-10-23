@@ -103,6 +103,29 @@ class EnumerationTab(QWidget):
             options['privileges'] = True
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'enum_all' in options:
+            self.enum_all_check.setChecked(options['enum_all'])
+        if 'current_user' in options:
+            self.current_user_check.setChecked(options['current_user'])
+        if 'hostname' in options:
+            self.hostname_check.setChecked(options['hostname'])
+        if 'is_root' in options:
+            self.is_root_check.setChecked(options['is_root'])
+        if 'is_admin' in options:
+            self.is_admin_check.setChecked(options['is_admin'])
+        if 'sys_info' in options:
+            self.sys_info_check.setChecked(options['sys_info'])
+        if 'ps_version' in options:
+            self.ps_version_check.setChecked(options['ps_version'])
+        if 'users' in options:
+            self.users_check.setChecked(options['users'])
+        if 'passwords' in options:
+            self.passwords_check.setChecked(options['passwords'])
+        if 'privileges' in options:
+            self.privileges_check.setChecked(options['privileges'])
         
     def reset(self):
         """Reset all fields to default"""

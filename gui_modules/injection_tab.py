@@ -231,6 +231,39 @@ class InjectionTab(QWidget):
             options['msf_path'] = self.msf_path_input.text()
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'test_parameter' in options:
+            self.test_param_input.setText(options['test_parameter'])
+        if 'skip_parameter' in options:
+            self.skip_param_input.setText(options['skip_parameter'])
+        if 'prefix' in options:
+            self.prefix_input.setText(options['prefix'])
+        if 'suffix' in options:
+            self.suffix_input.setText(options['suffix'])
+        if 'tech' in options:
+            self.technique_input.setText(options['tech'])
+        if 'skip_tech' in options:
+            self.skip_technique_input.setText(options['skip_tech'])
+        if 'timesec' in options:
+            self.timesec_spin.setValue(options['timesec'])
+        if 'maxlen' in options:
+            self.maxlen_spin.setValue(options['maxlen'])
+        if 'os_cmd' in options:
+            self.os_cmd_input.setText(options['os_cmd'])
+        if 'os' in options:
+            self.os_input.setText(options['os'])
+        if 'alter_shell' in options:
+            self.alter_shell_input.setText(options['alter_shell'])
+        if 'tmp_path' in options:
+            self.tmp_path_input.setText(options['tmp_path'])
+        if 'web_root' in options:
+            self.web_root_input.setText(options['web_root'])
+        if 'tamper' in options:
+            self.tamper_input.setPlainText(options['tamper'])
+        if 'msf_path' in options:
+            self.msf_path_input.setText(options['msf_path'])
         
     def reset(self):
         """Reset all fields to default"""

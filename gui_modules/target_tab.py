@@ -172,6 +172,31 @@ class TargetTab(QWidget):
             
         return options
         
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'url' in options:
+            self.url_input.setText(options['url'])
+        if 'requestfile' in options:
+            self.request_file_input.setText(options['requestfile'])
+        if 'logfile' in options:
+            self.log_file_input.setText(options['logfile'])
+        if 'bulkfile' in options:
+            self.bulk_file_input.setText(options['bulkfile'])
+        if 'sitemap_url' in options:
+            self.sitemap_input.setText(options['sitemap_url'])
+        if 'method' in options:
+            index = self.method_combo.findText(options['method'])
+            if index >= 0:
+                self.method_combo.setCurrentIndex(index)
+        if 'url_reload' in options:
+            self.url_reload_check.setChecked(options['url_reload'])
+        if 'crawldepth' in options:
+            self.crawl_depth_spin.setValue(options['crawldepth'])
+        if 'crawl_exclude' in options:
+            self.crawl_exclude_input.setText(options['crawl_exclude'])
+        if 'data' in options:
+            self.data_input.setPlainText(options['data'])
+    
     def reset(self):
         """Reset all fields to default"""
         self.url_input.clear()

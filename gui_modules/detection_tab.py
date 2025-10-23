@@ -80,6 +80,19 @@ class DetectionTab(QWidget):
             options['failed_tries'] = self.failed_tries_spin.value()
             
         return options
+    
+    def set_options(self, options):
+        """Load options into this tab"""
+        if 'level' in options:
+            self.level_spin.setValue(options['level'])
+        if 'skip_calc' in options:
+            self.skip_calc_check.setChecked(options['skip_calc'])
+        if 'skip_empty' in options:
+            self.skip_empty_check.setChecked(options['skip_empty'])
+        if 'smart' in options:
+            self.smart_check.setChecked(options['smart'])
+        if 'failed_tries' in options:
+            self.failed_tries_spin.setValue(options['failed_tries'])
         
     def reset(self):
         """Reset all fields to default"""
