@@ -9,6 +9,7 @@ import os
 import sys
 import subprocess
 from PyQt6.QtCore import QThread, pyqtSignal
+from gui_modules.option_validator import get_validator
 
 
 class CommixRunner(QThread):
@@ -28,6 +29,28 @@ class CommixRunner(QThread):
     def run(self):
         """Execute Commix"""
         try:
+            # Validate options before execution
+            validator = get_validator()
+            is_valid, errors, warnings = validator.validate_all(self.options)
+            
+            if not is_valid:
+                # Emit validation errors
+                self.error_signal.emit("\n❌ VALIDATION ERRORS FOUND:\n")
+                self.error_signal.emit("=" * 80 + "\n")
+                for i, error in enumerate(errors, 1):
+                    self.error_signal.emit(f"{i}. {error}\n")
+                self.error_signal.emit("=" * 80 + "\n")
+                self.error_signal.emit("\n⚠️  Please fix the above errors before running Commix.\n")
+                self.finished_signal.emit(1)
+                return
+            
+            # Emit warnings if any
+            if warnings:
+                self.output_signal.emit("\n⚠️  WARNINGS:\n")
+                for i, warning in enumerate(warnings, 1):
+                    self.output_signal.emit(f"{i}. {warning}\n")
+                self.output_signal.emit("\n")
+            
             # Build command
             cmd = self.build_command()
             
