@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+commix/
+*.log
+.DS_Store
+.pyc
